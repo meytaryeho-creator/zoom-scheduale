@@ -1,0 +1,25 @@
+{
+  "entities": {
+    "Lesson": {
+      "title": "Lesson",
+      "description": "A scheduled Zoom lesson",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Name of the lesson" },
+        "teacher": { "type": "string", "description": "Name of the teacher" },
+        "startTime": { "type": "string", "description": "Start time (HH:mm)" },
+        "endTime": { "type": "string", "description": "End time (HH:mm)" },
+        "day": { "type": "string", "description": "Day of the week" },
+        "zoomLink": { "type": "string", "description": "Zoom meeting link" },
+        "color": { "type": "string", "description": "Pastel color code" }
+      },
+      "required": ["title", "teacher", "startTime", "endTime", "day", "zoomLink"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/lessons/{lessonId}": {
+      "schema": "Lesson",
+      "description": "User's personal lessons"
+    }
+  }
+}

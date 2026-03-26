@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: /users/{userId}/lessons
+    // Document ID: auto-generated
+    // Fields:
+    //   - title: string (required)
+    //   - teacher: string (required)
+    //   - startTime: string (required, HH:mm)
+    //   - endTime: string (required, HH:mm)
+    //   - day: string (required)
+    //   - zoomLink: string (required)
+    //   - color: string (optional)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidLesson(data) {
+      return data.keys().hasAll(['title', 'teacher', 'startTime', 'endTime', 'day', 'zoomLink']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 100 &&
+             data.teacher is string && data.teacher.size() > 0 && data.teacher.size() < 100 &&
+             data.startTime is string && data.startTime.matches('^[0-9]{2}:[0-9]{2}$') &&
+             data.endTime is string && data.endTime.matches('^[0-9]{2}:[0-9]{2}$') &&
+             data.day is string && data.day.size() > 0 &&
+             data.zoomLink is string && data.zoomLink.size() > 0 && data.zoomLink.size() < 500 &&
+             (!('color' in data) || (data.color is string && data.color.size() < 100));
+    }
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      
+      match /lessons/{lessonId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidLesson(request.resource.data);
+        allow update: if isOwner(userId) && isValidLesson(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "name": "Zoom Schedule Manager",
+  "description": "A personalized Zoom lesson schedule system with Google Authentication, allowing students to manage their classes and join Zoom meetings directly from a beautiful, pastel-themed table.",
+  "requestFramePermissions": []
+}
